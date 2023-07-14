@@ -65,4 +65,8 @@ contract Reveal is Test {
         vm.prank(alice);
         secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
     }
+
+    function test_Reveal() public {
+        assert(false);
+    }
 }
