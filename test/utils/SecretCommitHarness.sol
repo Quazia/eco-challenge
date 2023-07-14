@@ -27,4 +27,12 @@ contract SecretCommitHarness is SecretCommit {
                 )
             );
     }
+
+    function domainNameAndVersion()
+        public
+        pure
+        returns (string memory name, string memory version)
+    {
+        return super._domainNameAndVersion();
+    }
 }

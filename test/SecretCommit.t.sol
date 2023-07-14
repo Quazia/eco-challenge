@@ -195,3 +195,20 @@ contract HashStruct is Test {
         );
     }
 }
+
+contract DomainNameAndVersion is Test {
+    SecretCommitHarness secretCommitHarness;
+
+    function setUp() public {
+        secretCommitHarness = new SecretCommitHarness();
+    }
+
+    function test_DomainNameAndVersion() public {
+        (string memory name, string memory version) = secretCommitHarness
+            .domainNameAndVersion();
+        assertEq(
+            keccak256(abi.encodePacked(name, version)),
+            keccak256(abi.encodePacked("SecretCommit", "1"))
+        );
+    }
+}
