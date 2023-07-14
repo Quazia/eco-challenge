@@ -37,6 +37,10 @@ contract SecretCommit is EIP712 {
         return _hashTypedData(hashStruct(secret));
     }
 
+    function commitExists(bytes32 hashSecret) public view returns (bool) {
+        return commitments[hashSecret].hashSecret == hashSecret;
+    }
+
     function commit(
         bytes32 hashSecret,
         uint8 v1,
@@ -51,7 +55,7 @@ contract SecretCommit is EIP712 {
                 ecrecover(hashSecret, v2, r2, s2) == msg.sender,
             "Invalid signature"
         );
-        //require(!commitExists(hashSecret), "Commit already exists");
+        require(!commitExists(hashSecret), "Commit already exists");
         commitments[hashSecret] = Commitment(
             Signature(v1, r1, s1),
             Signature(v2, r2, s2),
