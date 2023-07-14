@@ -2,6 +2,7 @@
 pragma solidity 0.8.19;
 
 import "forge-std/Test.sol";
+import "forge-std/console.sol";
 
 import "src/SecretCommit.sol";
 
@@ -23,12 +24,12 @@ contract Commit is Test {
     function test_Commit() public {
         bytes memory secret = abi.encode("secret");
         Secret memory secretStruct = Secret(alice, bob, secret);
-        bool exists = false;
         bytes32 hashSecret = secretCommit.hashTypedData(secretStruct);
         (uint8 v1, bytes32 r1, bytes32 s1) = vm.sign(akey, hashSecret);
         (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(bkey, hashSecret);
+        vm.prank(alice);
         secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
-        // bool exists = secretCommit.commitExists(hashSecret);
+        bool exists = secretCommit.commitExists(hashSecret);
         assertTrue(exists);
     }
 }
