@@ -73,4 +73,8 @@ contract Reveal is Test {
     function testFuzz_Reveal() public {
         assert(false);
     }
+
+    function test_RevertIf_CommitDoesNotExist() public {
+        assert(false);
+    }
 }
