@@ -81,14 +81,18 @@ contract Reveal is Test {
     address bob;
     uint256 akey;
     uint256 bkey;
+    Secret secretStruct;
+    bytes32 hashSecret;
+    bytes secret;
+    event Reveal(bytes secret, address revealer);
 
     function setUp() public {
         (alice, akey) = makeAddrAndKey("alice");
         (bob, bkey) = makeAddrAndKey("bob");
         secretCommit = new SecretCommit();
-        bytes memory secret = abi.encode("secret");
-        Secret memory secretStruct = Secret(alice, bob, secret);
-        bytes32 hashSecret = secretCommit.hashTypedData(secretStruct);
+        secret = abi.encode("secret");
+        secretStruct = Secret(alice, bob, secret);
+        hashSecret = secretCommit.hashTypedData(secretStruct);
         (uint8 v1, bytes32 r1, bytes32 s1) = vm.sign(akey, hashSecret);
         (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(bkey, hashSecret);
         vm.prank(alice);
@@ -96,7 +100,15 @@ contract Reveal is Test {
     }
 
     function test_Reveal() public {
-        assert(false);
+        bool exists = secretCommit.commitExists(hashSecret);
+        assertTrue(exists);
+        vm.prank(alice);
+        vm.expectEmit();
+        emit Reveal(secret, alice);
+        secretCommit.reveal(secretStruct);
+
+        exists = secretCommit.commitExists(hashSecret);
+        assertFalse(exists);
     }
 
     function testFuzz_Reveal() public {
