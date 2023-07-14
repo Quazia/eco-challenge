@@ -133,12 +133,12 @@ contract Reveal is Test {
         secretCommit.reveal(secretStruct);
     }
 
-    function test_RevertIf_InvalidCouterparty() public {
+    function test_RevertIf_InvalidCounterparty() public {
         // This test is a bit of an edge case,
-        // and realistically it might not actually be worth guardnig against
-        // but we want to test a mis-match between listed signers and actual signers
+        // and realistically it might not actually be worth guarding against
+        // but we want to test a mis-match between listed signers and actual signers.
         // If this edge case isn't important to guard against it's possible to slim
-        // the implementation down quite a bit
+        // the implementation down a bit.
         address craig;
         uint256 ckey;
         (craig, ckey) = makeAddrAndKey("craig");
