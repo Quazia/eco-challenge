@@ -33,8 +33,15 @@ contract Commit is Test {
         assertTrue(exists);
     }
 
-    function testFuzz_Commit() public {
-        assert(false);
+    function testFuzz_Commit(bytes memory secret) public {
+        Secret memory secretStruct = Secret(alice, bob, secret);
+        bytes32 hashSecret = secretCommit.hashTypedData(secretStruct);
+        (uint8 v1, bytes32 r1, bytes32 s1) = vm.sign(akey, hashSecret);
+        (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(bkey, hashSecret);
+        vm.prank(alice);
+        secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
+        bool exists = secretCommit.commitExists(hashSecret);
+        assertTrue(exists);
     }
 
     function test_RevertIf_CommitExists() public {
