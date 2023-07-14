@@ -69,4 +69,8 @@ contract Reveal is Test {
     function test_Reveal() public {
         assert(false);
     }
+
+    function testFuzz_Reveal() public {
+        assert(false);
+    }
 }
