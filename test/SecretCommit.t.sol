@@ -129,7 +129,8 @@ contract Reveal is Test {
     }
 
     function test_RevertIf_InvalidSender() public {
-        assert(false);
+        vm.expectRevert("Invalid revealer");
+        secretCommit.reveal(secretStruct);
     }
 
     function test_RevertIf_InvalidCouterparty() public {
