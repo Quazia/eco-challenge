@@ -8,5 +8,5 @@ bytes32 constant SECRET_TYPEHASH = keccak256(
 struct Secret {
     address signerOne;
     address signerTwo;
-    bytes secret;
+    bytes payload;
 }
