@@ -106,14 +106,12 @@ contract Reveal is Test {
         vm.expectEmit();
         emit Reveal(secret, alice);
         secretCommit.reveal(secretStruct);
-
         exists = secretCommit.commitExists(hashSecret);
         assertFalse(exists);
     }
 
     function test_RevertIf_CommitDoesNotExist() public {
         bytes memory differentSecret = abi.encode("differentSecret");
-
         Secret memory differentSecretStruct = Secret(
             alice,
             bob,
@@ -156,7 +154,6 @@ contract Reveal is Test {
         address craig;
         uint256 ckey;
         (craig, ckey) = makeAddrAndKey("craig");
-
         Secret memory differentSecretStruct = Secret(alice, craig, secret);
         bytes32 differentHashSecret = secretCommit.hashTypedData(
             differentSecretStruct
