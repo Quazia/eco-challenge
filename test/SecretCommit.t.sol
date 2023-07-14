@@ -61,7 +61,17 @@ contract Commit is Test {
     }
 
     function test_RevertIf_InvalidSender() public {
-        assert(false);
+        bytes memory secret = abi.encode("secret");
+        Secret memory secretStruct = Secret(alice, bob, secret);
+        bytes32 hashSecret = secretCommit.hashTypedData(secretStruct);
+        (uint8 v1, bytes32 r1, bytes32 s1) = vm.sign(akey, hashSecret);
+        (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(bkey, hashSecret);
+        vm.prank(alice);
+        secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
+        bool exists = secretCommit.commitExists(hashSecret);
+        assertTrue(exists);
+        vm.expectRevert("Invalid signature");
+        secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
     }
 }
 
