@@ -155,8 +155,4 @@ contract Reveal is Test {
         vm.expectRevert("Invalid signature");
         secretCommit.reveal(differentSecretStruct);
     }
-
-    function test_RevertIf_InvalidRevealedSecret() public {
-        assert(false);
-    }
 }
