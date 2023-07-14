@@ -85,4 +85,8 @@ contract Reveal is Test {
     function test_RevertIf_InvalidCouterparty() public {
         assert(false);
     }
+
+    function test_RevertIf_InvalidRevealedSecret() public {
+        assert(false);
+    }
 }
