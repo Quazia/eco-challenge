@@ -33,4 +33,20 @@ contract SecretCommit is EIP712 {
     ) external view virtual returns (bytes32 digest) {
         _hashTypedData(hashStruct(secret));
     }
+
+    function commit(
+        bytes32 hashSecret,
+        uint8 v1,
+        bytes32 r1,
+        bytes32 s1,
+        uint8 v2,
+        bytes32 r2,
+        bytes32 s2
+    ) external {
+        require(
+            ecrecover(hashSecret, v1, r1, s1) == msg.sender ||
+                ecrecover(hashSecret, v2, r2, s2) == msg.sender,
+            "Invalid signature"
+        );
+    }
 }
