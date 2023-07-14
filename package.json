@@ -5,7 +5,8 @@
   "version": "1.0.0",
   "description": "Basic forge smart contract template",
   "scripts": {
-    "lint": "yarn prettier && yarn solhint"
+    "lint": "yarn prettier && yarn solhint",
+    "reports": "forge coverage --report lcov && forge snapshot"
   },
   "devDependencies": {
     "prettier": "^3.0.0",
