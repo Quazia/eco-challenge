@@ -36,6 +36,10 @@ contract Commit is Test {
     function testFuzz_Commit() public {
         assert(false);
     }
+
+    function test_RevertIf_CommitExists() {
+        assert(false);
+    }
 }
 
 contract Reveal is Test {
