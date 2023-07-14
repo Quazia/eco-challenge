@@ -6,6 +6,7 @@ import {EIP712} from "solady/utils/EIP712.sol";
 
 contract SecretCommit is EIP712 {
     mapping(bytes32 => Commitment) public commitments;
+    event Reveal(bytes indexed secret, address indexed revealer);
 
     function _domainNameAndVersion()
         internal
@@ -61,5 +62,31 @@ contract SecretCommit is EIP712 {
             Signature(v2, r2, s2),
             hashSecret
         );
+    }
+
+    function reveal(Secret calldata secret) external {
+        bytes32 digest = hashTypedData(secret);
+        require(commitExists(digest), "Commit does not exist");
+        Commitment memory commitment = commitments[digest];
+        Signature memory signatureOne = commitment.signatureOne;
+        Signature memory signatureTwo = commitment.signatureTwo;
+        require(
+            ecrecover(digest, signatureOne.v, signatureOne.r, signatureOne.s) ==
+                secret.signerOne &&
+                ecrecover(
+                    digest,
+                    signatureTwo.v,
+                    signatureTwo.r,
+                    signatureTwo.s
+                ) ==
+                secret.signerTwo,
+            "Invalid signature"
+        );
+        require(
+            secret.signerOne == msg.sender || secret.signerTwo == msg.sender,
+            "Invalid revealer"
+        );
+        emit Reveal(secret.payload, msg.sender);
+        delete commitments[digest];
     }
 }
