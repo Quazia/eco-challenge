@@ -134,7 +134,26 @@ contract Reveal is Test {
     }
 
     function test_RevertIf_InvalidCouterparty() public {
-        assert(false);
+        // This test is a bit of an edge case,
+        // and realistically it might not actually be worth guardnig against
+        // but we want to test a mis-match between listed signers and actual signers
+        // If this edge case isn't important to guard against it's possible to slim
+        // the implementation down quite a bit
+        address craig;
+        uint256 ckey;
+        (craig, ckey) = makeAddrAndKey("craig");
+
+        Secret memory differentSecretStruct = Secret(alice, craig, secret);
+        bytes32 differentHashSecret = secretCommit.hashTypedData(
+            differentSecretStruct
+        );
+        (uint8 v1, bytes32 r1, bytes32 s1) = vm.sign(akey, differentHashSecret);
+        (uint8 v2, bytes32 r2, bytes32 s2) = vm.sign(bkey, differentHashSecret);
+        vm.prank(alice);
+        secretCommit.commit(differentHashSecret, v1, r1, s1, v1, r1, s1);
+        vm.prank(alice);
+        vm.expectRevert("Invalid signature");
+        secretCommit.reveal(differentSecretStruct);
     }
 
     function test_RevertIf_InvalidRevealedSecret() public {
