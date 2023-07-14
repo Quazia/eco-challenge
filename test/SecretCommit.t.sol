@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
 import {SecretCommit} from "src/SecretCommit.sol";
-
+import {SecretCommitHarness} from "test/utils/SecretCommitHarness.sol";
 import {Secret} from "src/types/structs/Secret.sol";
 
 contract Commit is Test {
@@ -165,5 +165,28 @@ contract Reveal is Test {
         vm.prank(alice);
         vm.expectRevert("Invalid signature");
         secretCommit.reveal(differentSecretStruct);
+    }
+}
+
+contract HashStruct is Test {
+    SecretCommitHarness secretCommitHarness;
+    address alice;
+    address bob;
+    Secret secretStruct;
+    bytes secret;
+
+    function setUp() public {
+        alice = makeAddr("alice");
+        bob = makeAddr("bob");
+        secret = abi.encode("secret");
+        secretStruct = Secret(alice, bob, secret);
+        secretCommitHarness = new SecretCommitHarness();
+    }
+
+    function test_HashStruct() public {
+        assertEq(
+            secretCommitHarness.hashStruct(secretStruct),
+            secretCommitHarness.hashStructNaive(secretStruct)
+        );
     }
 }
