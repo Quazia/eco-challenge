@@ -44,16 +44,21 @@ contract SecretCommit is EIP712 {
     /// @notice Reveals a secret if the commit exists and the signatures are valid
     /// @param secret Secret struct encapsulating the secret we want to reveal
     function reveal(Secret calldata secret) external {
-        bytes32 digest = hashTypedData(secret);
-        require(commitExists(digest), "Commit does not exist");
-        Commitment memory commitment = commitments[digest];
+        bytes32 typedDataHash = hashTypedData(secret);
+        require(commitExists(typedDataHash), "Commit does not exist");
+        Commitment memory commitment = commitments[typedDataHash];
         Signature memory signatureOne = commitment.signatureOne;
         Signature memory signatureTwo = commitment.signatureTwo;
         require(
-            ecrecover(digest, signatureOne.v, signatureOne.r, signatureOne.s) ==
+            ecrecover(
+                typedDataHash,
+                signatureOne.v,
+                signatureOne.r,
+                signatureOne.s
+            ) ==
                 secret.signerOne &&
                 ecrecover(
-                    digest,
+                    typedDataHash,
                     signatureTwo.v,
                     signatureTwo.r,
                     signatureTwo.s
@@ -66,15 +71,15 @@ contract SecretCommit is EIP712 {
             "Invalid revealer"
         );
         emit Reveal(secret.payload, msg.sender);
-        delete commitments[digest];
+        delete commitments[typedDataHash];
     }
 
     /// @dev Leverages solady EIP712 to get full hash of our secret, domain separator and EIP-191 version byte
     /// @param secret Secret struct encapsulating the secret we want to sign
-    /// @return digest Full hash of our secret, domain separator and EIP-191 version byte
+    /// @return typedDataHash Full hash of our secret, domain separator and EIP-191 version byte
     function hashTypedData(
         Secret calldata secret
-    ) public view virtual returns (bytes32 digest) {
+    ) public view virtual returns (bytes32 typedDataHash) {
         return _hashTypedData(hashStruct(secret));
     }
 
@@ -103,7 +108,7 @@ contract SecretCommit is EIP712 {
     /// @dev Gives us the hash of our main secret for use in EIP712 signing
     /// @param secret Secret struct encapsulating the secret we want to sign
     /// @return structHash Hash of the secret struct
-    function hashStruct(
+    function _hashStruct(
         Secret calldata secret
     ) internal pure returns (bytes32 structHash) {
         return
