@@ -34,7 +34,7 @@ contract SecretCommit is EIP712 {
     function hashTypedData(
         Secret memory secret
     ) external view virtual returns (bytes32 digest) {
-        _hashTypedData(hashStruct(secret));
+        return _hashTypedData(hashStruct(secret));
     }
 
     function commit(
