@@ -116,7 +116,16 @@ contract Reveal is Test {
     }
 
     function test_RevertIf_CommitDoesNotExist() public {
-        assert(false);
+        bytes memory differentSecret = abi.encode("differentSecret");
+
+        Secret memory differentSecretStruct = Secret(
+            alice,
+            bob,
+            differentSecret
+        );
+        vm.prank(alice);
+        vm.expectRevert("Commit does not exist");
+        secretCommit.reveal(differentSecretStruct);
     }
 
     function test_RevertIf_InvalidSender() public {
