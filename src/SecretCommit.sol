@@ -8,56 +8,8 @@ import {EIP712} from "solady/utils/EIP712.sol";
 /// @notice This contract allows exactly two parties to commit to and reveal a secret
 /// @author Arthur Lunn
 contract SecretCommit is EIP712 {
-    mapping(bytes32 => Commitment) public commitments;
     event Reveal(bytes indexed secret, address indexed revealer);
-
-    /// @dev Overriden to enable EIP712
-    /// @return name Name of this contract for use in domain separator
-    /// @return version Version of this contract for use in domain separator
-    function _domainNameAndVersion()
-        internal
-        pure
-        override
-        returns (string memory name, string memory version)
-    {
-        name = "SecretCommit";
-        version = "1";
-    }
-
-    /// @dev Gives us the hash of our main secret for use in EIP712 signing
-    /// @param secret Secret struct encapsulating the secret we want to sign
-    /// @return structHash Hash of the secret struct
-    function hashStruct(
-        Secret calldata secret
-    ) internal pure returns (bytes32 structHash) {
-        return
-            keccak256(
-                abi.encode(
-                    SECRET_TYPEHASH,
-                    secret.signerOne,
-                    secret.signerTwo,
-                    keccak256(secret.payload)
-                )
-            );
-    }
-
-    /// @dev Leverages solady EIP712 to get full hash of our secret, domain separator and EIP-191 version byte
-    /// @param secret Secret struct encapsulating the secret we want to sign
-    /// @return digest Full hash of our secret, domain separator and EIP-191 version byte
-    function hashTypedData(
-        Secret calldata secret
-    ) public view virtual returns (bytes32 digest) {
-        return _hashTypedData(hashStruct(secret));
-    }
-
-    /// @notice Checks if a commit exists
-    /// @param hashSecret Hash of the secret we want to check
-    /// @return exists Boolean indicating if the commit exists
-    function commitExists(
-        bytes32 hashSecret
-    ) public view returns (bool exists) {
-        return commitments[hashSecret].hashSecret == hashSecret;
-    }
+    mapping(bytes32 => Commitment) public commitments;
 
     /// @notice Commits two parties to a secret by storing their signatures in a single block
     /// @param hashSecret Hash of the secret we want to commit to
@@ -115,5 +67,53 @@ contract SecretCommit is EIP712 {
         );
         emit Reveal(secret.payload, msg.sender);
         delete commitments[digest];
+    }
+
+    /// @dev Leverages solady EIP712 to get full hash of our secret, domain separator and EIP-191 version byte
+    /// @param secret Secret struct encapsulating the secret we want to sign
+    /// @return digest Full hash of our secret, domain separator and EIP-191 version byte
+    function hashTypedData(
+        Secret calldata secret
+    ) public view virtual returns (bytes32 digest) {
+        return _hashTypedData(hashStruct(secret));
+    }
+
+    /// @notice Checks if a commit exists
+    /// @param hashSecret Hash of the secret we want to check
+    /// @return exists Boolean indicating if the commit exists
+    function commitExists(
+        bytes32 hashSecret
+    ) public view returns (bool exists) {
+        return commitments[hashSecret].hashSecret == hashSecret;
+    }
+
+    /// @dev Overriden to enable EIP712
+    /// @return name Name of this contract for use in domain separator
+    /// @return version Version of this contract for use in domain separator
+    function _domainNameAndVersion()
+        internal
+        pure
+        override
+        returns (string memory name, string memory version)
+    {
+        name = "SecretCommit";
+        version = "1";
+    }
+
+    /// @dev Gives us the hash of our main secret for use in EIP712 signing
+    /// @param secret Secret struct encapsulating the secret we want to sign
+    /// @return structHash Hash of the secret struct
+    function hashStruct(
+        Secret calldata secret
+    ) internal pure returns (bytes32 structHash) {
+        return
+            keccak256(
+                abi.encode(
+                    SECRET_TYPEHASH,
+                    secret.signerOne,
+                    secret.signerTwo,
+                    keccak256(secret.payload)
+                )
+            );
     }
 }
