@@ -124,6 +124,24 @@ contract Reveal is Test {
         secretCommit.reveal(differentSecretStruct);
     }
 
+    function testFuzz_RevertIf_CommitDoesNotExist(
+        string calldata secretString
+    ) public {
+        vm.assume(
+            keccak256(abi.encodePacked(secretString)) !=
+                keccak256(abi.encodePacked("secret"))
+        );
+        bytes memory differentSecret = abi.encode(secretString);
+        Secret memory differentSecretStruct = Secret(
+            alice,
+            bob,
+            differentSecret
+        );
+        vm.prank(alice);
+        vm.expectRevert("Commit does not exist");
+        secretCommit.reveal(differentSecretStruct);
+    }
+
     function test_RevertIf_InvalidSender() public {
         vm.expectRevert("Invalid revealer");
         secretCommit.reveal(secretStruct);
