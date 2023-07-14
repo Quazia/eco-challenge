@@ -8,6 +8,11 @@ import {SecretCommit} from "src/SecretCommit.sol";
 import {SecretCommitHarness} from "test/utils/SecretCommitHarness.sol";
 import {Secret} from "src/types/structs/Secret.sol";
 
+error InvalidSignature();
+error CommitAlreadyExists();
+error CommitDoesNotExist();
+error InvalidRevealer();
+
 contract Commit is Test {
     SecretCommit secretCommit;
     address alice;
@@ -54,7 +59,7 @@ contract Commit is Test {
         secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
         bool exists = secretCommit.commitExists(hashSecret);
         assertTrue(exists);
-        vm.expectRevert("Commit already exists");
+        vm.expectRevert(CommitAlreadyExists.selector);
         secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
         // Not explicitly needed, but for clarity
         vm.stopPrank();
@@ -70,7 +75,7 @@ contract Commit is Test {
         secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
         bool exists = secretCommit.commitExists(hashSecret);
         assertTrue(exists);
-        vm.expectRevert("Invalid signature");
+        vm.expectRevert(InvalidSignature.selector);
         secretCommit.commit(hashSecret, v1, r1, s1, v2, r2, s2);
     }
 }
@@ -118,7 +123,7 @@ contract Reveal is Test {
             differentSecret
         );
         vm.prank(alice);
-        vm.expectRevert("Commit does not exist");
+        vm.expectRevert(CommitDoesNotExist.selector);
         secretCommit.reveal(differentSecretStruct);
     }
 
@@ -136,12 +141,12 @@ contract Reveal is Test {
             differentSecret
         );
         vm.prank(alice);
-        vm.expectRevert("Commit does not exist");
+        vm.expectRevert(CommitDoesNotExist.selector);
         secretCommit.reveal(differentSecretStruct);
     }
 
     function test_RevertIf_InvalidSender() public {
-        vm.expectRevert("Invalid revealer");
+        vm.expectRevert(InvalidRevealer.selector);
         secretCommit.reveal(secretStruct);
     }
 
@@ -163,7 +168,7 @@ contract Reveal is Test {
         vm.prank(alice);
         secretCommit.commit(differentHashSecret, v1, r1, s1, v1, r1, s1);
         vm.prank(alice);
-        vm.expectRevert("Invalid signature");
+        vm.expectRevert(InvalidSignature.selector);
         secretCommit.reveal(differentSecretStruct);
     }
 }

@@ -5,6 +5,10 @@ import {ISecretCommit} from "src/types/interfaces/ISecretCommit.sol";
 import {Secret, SECRET_TYPEHASH} from "src/types/structs/Secret.sol";
 import {Commitment, Signature} from "src/types/structs/Commitment.sol";
 import {EIP712} from "solady/utils/EIP712.sol";
+error InvalidSignature();
+error CommitAlreadyExists();
+error CommitDoesNotExist();
+error InvalidRevealer();
 
 /// @notice This contract allows exactly two parties to commit to and reveal a secret
 /// @author Arthur Lunn
@@ -21,12 +25,11 @@ contract SecretCommit is EIP712, ISecretCommit {
         bytes32 r2,
         bytes32 s2
     ) external {
-        require(
-            ecrecover(hashSecret, v1, r1, s1) == msg.sender ||
-                ecrecover(hashSecret, v2, r2, s2) == msg.sender,
-            "Invalid signature"
-        );
-        require(!commitExists(hashSecret), "Commit already exists");
+        if (
+            ecrecover(hashSecret, v1, r1, s1) != msg.sender &&
+            ecrecover(hashSecret, v2, r2, s2) != msg.sender
+        ) revert InvalidSignature();
+        if (commitExists(hashSecret)) revert CommitAlreadyExists();
         commitments[hashSecret] = Commitment(
             Signature(v1, r1, s1),
             Signature(v2, r2, s2),
@@ -37,31 +40,28 @@ contract SecretCommit is EIP712, ISecretCommit {
     ///@inheritdoc ISecretCommit
     function reveal(Secret calldata secret) external {
         bytes32 typedDataHash = hashTypedData(secret);
-        require(commitExists(typedDataHash), "Commit does not exist");
+        if (!commitExists(typedDataHash)) revert CommitDoesNotExist();
         Commitment memory commitment = commitments[typedDataHash];
         Signature memory signatureOne = commitment.signatureOne;
         Signature memory signatureTwo = commitment.signatureTwo;
-        require(
+        if (
             ecrecover(
                 typedDataHash,
                 signatureOne.v,
                 signatureOne.r,
                 signatureOne.s
-            ) ==
-                secret.signerOne &&
-                ecrecover(
-                    typedDataHash,
-                    signatureTwo.v,
-                    signatureTwo.r,
-                    signatureTwo.s
-                ) ==
-                secret.signerTwo,
-            "Invalid signature"
-        );
-        require(
-            secret.signerOne == msg.sender || secret.signerTwo == msg.sender,
-            "Invalid revealer"
-        );
+            ) !=
+            secret.signerOne ||
+            ecrecover(
+                typedDataHash,
+                signatureTwo.v,
+                signatureTwo.r,
+                signatureTwo.s
+            ) !=
+            secret.signerTwo
+        ) revert InvalidSignature();
+        if (secret.signerOne != msg.sender && secret.signerTwo != msg.sender)
+            revert InvalidRevealer();
         emit Reveal(secret.payload, msg.sender);
         delete commitments[typedDataHash];
     }
