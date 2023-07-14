@@ -5,19 +5,19 @@ import "forge-std/Test.sol";
 
 import "src/SecretCommit.sol";
 
-contract TestSecretCommit is Test {
-    SecretCommit secret;
+contract Commit is Test {
+    SecretCommit secretCommit;
 
     function setUp() public {
-        secret = new SecretCommit();
+        secretCommit = new SecretCommit();
     }
+}
 
-    function testBar() public {
-        assertEq(uint256(1), uint256(1), "ok");
-    }
+contract Reveal is Test {
+    SecretCommit secretCommit;
 
-    function testFoo(uint256 x) public {
-        vm.assume(x < type(uint128).max);
-        assertEq(x + x, x * 2);
+    function setUp() public {
+        secretCommit = new SecretCommit();
+        // Perform Commit Logic in setup
     }
 }
