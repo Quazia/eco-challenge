@@ -32,6 +32,10 @@ contract Commit is Test {
         bool exists = secretCommit.commitExists(hashSecret);
         assertTrue(exists);
     }
+
+    function testFuzz_Commit() public {
+        assert(false);
+    }
 }
 
 contract Reveal is Test {
