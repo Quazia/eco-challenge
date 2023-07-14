@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.19;
 import "src/types/structs/Secret.sol";
+import "src/types/structs/Commitment.sol";
 import "solady/utils/EIP712.sol";
 
 contract SecretCommit is EIP712 {
+    mapping(bytes32 => Commitment) public commitments;
+
     function _domainNameAndVersion()
         internal
         pure
@@ -47,6 +50,12 @@ contract SecretCommit is EIP712 {
             ecrecover(hashSecret, v1, r1, s1) == msg.sender ||
                 ecrecover(hashSecret, v2, r2, s2) == msg.sender,
             "Invalid signature"
+        );
+        //require(!commitExists(hashSecret), "Commit already exists");
+        commitments[hashSecret] = Commitment(
+            Signature(v1, r1, s1),
+            Signature(v2, r2, s2),
+            hashSecret
         );
     }
 }
