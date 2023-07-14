@@ -111,10 +111,6 @@ contract Reveal is Test {
         assertFalse(exists);
     }
 
-    function testFuzz_Reveal() public {
-        assert(false);
-    }
-
     function test_RevertIf_CommitDoesNotExist() public {
         bytes memory differentSecret = abi.encode("differentSecret");
 
