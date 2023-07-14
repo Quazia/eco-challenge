@@ -18,7 +18,7 @@ contract SecretCommit is EIP712 {
     }
 
     function hashStruct(
-        Secret memory secret
+        Secret calldata secret
     ) internal pure returns (bytes32 structHash) {
         return
             keccak256(
@@ -32,8 +32,8 @@ contract SecretCommit is EIP712 {
     }
 
     function hashTypedData(
-        Secret memory secret
-    ) external view virtual returns (bytes32 digest) {
+        Secret calldata secret
+    ) public view virtual returns (bytes32 digest) {
         return _hashTypedData(hashStruct(secret));
     }
 
