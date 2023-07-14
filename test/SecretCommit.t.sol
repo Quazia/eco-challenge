@@ -40,6 +40,10 @@ contract Commit is Test {
     function test_RevertIf_CommitExists() {
         assert(false);
     }
+
+    function test_RevertIf_InvalidSender() {
+        assert(false);
+    }
 }
 
 contract Reveal is Test {
