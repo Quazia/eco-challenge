@@ -80,7 +80,7 @@ contract SecretCommit is EIP712 {
     function hashTypedData(
         Secret calldata secret
     ) public view virtual returns (bytes32 typedDataHash) {
-        return _hashTypedData(hashStruct(secret));
+        return _hashTypedData(_hashStruct(secret));
     }
 
     /// @notice Checks if a commit exists
