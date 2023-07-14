@@ -4,9 +4,9 @@ pragma solidity 0.8.19;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "src/SecretCommit.sol";
+import {SecretCommit} from "src/SecretCommit.sol";
 
-import "src/types/structs/Secret.sol";
+import {Secret} from "src/types/structs/Secret.sol";
 
 contract Commit is Test {
     SecretCommit secretCommit;

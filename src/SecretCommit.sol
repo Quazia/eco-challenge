@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.19;
-import "src/types/structs/Secret.sol";
-import "src/types/structs/Commitment.sol";
-import "solady/utils/EIP712.sol";
+import {Secret, SECRET_TYPEHASH} from "src/types/structs/Secret.sol";
+import {Commitment, Signature} from "src/types/structs/Commitment.sol";
+import {EIP712} from "solady/utils/EIP712.sol";
 
 contract SecretCommit is EIP712 {
     mapping(bytes32 => Commitment) public commitments;
