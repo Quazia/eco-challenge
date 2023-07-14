@@ -99,14 +99,14 @@ contract SecretCommit is EIP712, ISecretCommit {
     function _hashStruct(
         Secret calldata secret
     ) internal pure returns (bytes32 structHash) {
-        return
-            keccak256(
-                abi.encode(
-                    SECRET_TYPEHASH,
-                    secret.signerOne,
-                    secret.signerTwo,
-                    keccak256(secret.payload)
-                )
-            );
+        bytes32 payloadHash = keccak256(secret.payload);
+        assembly {
+            let m := mload(0x40) // Load the free memory pointer.
+            mstore(m, SECRET_TYPEHASH)
+            mstore(add(m, 0x20), calldataload(0x24)) // Get the first signer from calldata
+            mstore(add(m, 0x40), calldataload(0x44)) // Get the second signer from calldata
+            mstore(add(m, 0x60), payloadHash)
+            structHash := keccak256(m, 0x80)
+        }
     }
 }
