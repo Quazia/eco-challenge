@@ -84,7 +84,7 @@ contract Reveal is Test {
     Secret secretStruct;
     bytes32 hashSecret;
     bytes secret;
-    event Reveal(bytes secret, address revealer);
+    event Reveal(bytes indexed secret, address indexed revealer);
 
     function setUp() public {
         (alice, akey) = makeAddrAndKey("alice");
