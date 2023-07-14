@@ -19,7 +19,7 @@ contract SecretCommit is EIP712 {
 
     function hashStruct(
         Secret memory secret
-    ) internal pure returns (bytes32 hash) {
+    ) internal pure returns (bytes32 structHash) {
         return
             keccak256(
                 abi.encode(
